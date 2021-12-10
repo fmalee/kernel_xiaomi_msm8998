@@ -1,6 +1,7 @@
 #
 # Makefile for the FT5X46 touchscreen driver.
 #
+ccflags-y := -Wno-varargs
 
 obj-$(CONFIG_TOUCHSCREEN_FT5X46)	+= ft5x46_ts.o focaltech_test.o focaltech_test_ft8716.o
 obj-$(CONFIG_TOUCHSCREEN_FT5X46_I2C)	+= ft5x46_ts_i2c.o
