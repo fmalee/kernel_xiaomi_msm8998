@@ -2959,8 +2959,6 @@ static int ft5x46_pinctrl_select(struct ft5x46_data *ft5x46, bool on)
 }
 
 #if defined(CONFIG_FB)
-extern void mdss_dsi_ulps_enable(bool enable);
-extern void mdss_dsi_ulps_suspend_enable(bool enable);
 extern bool mdss_panel_is_prim(struct fb_info *fbi);
 static int fb_notifier_cb(struct notifier_block *self,
 	unsigned long event, void *data)
@@ -2978,8 +2976,6 @@ static int fb_notifier_cb(struct notifier_block *self,
 				dev_dbg(ft5x46->dev, "##### UNBLANK SCREEN #####\n");
 				ft5x46_input_enable(ft5x46->input);
 				ft5x46_power_on(ft5x46, true);
-				mdss_dsi_ulps_suspend_enable(false);
-				mdss_dsi_ulps_enable(false);
 			} else if (*blank == FB_BLANK_POWERDOWN) {
 				dev_dbg(ft5x46->dev, "##### BLANK SCREEN #####\n");
 				ft5x46_input_disable(ft5x46->input);
@@ -2998,9 +2994,6 @@ static int fb_notifier_cb(struct notifier_block *self,
 #else
 			if (*blank == FB_BLANK_POWERDOWN && ft5x46->wakeup_mode) {
 #endif
-				pr_debug("Enable suspend ulps\n");
-				mdss_dsi_ulps_enable(true);
-				mdss_dsi_ulps_suspend_enable(true);
 			}
 		}
 	}
