@@ -173,6 +173,9 @@ void *__ion_map_kernel(struct ion_buffer *buffer)
 
 	mutex_lock(&buffer->kmap_lock);
 	if (buffer->kmap_refcount) {
+		if (buffer->kmap_refcount == INT_MAX)
+			return ERR_PTR(-EOVERFLOW);
+
 		vaddr = buffer->vaddr;
 		buffer->kmap_refcount++;
 	} else {
