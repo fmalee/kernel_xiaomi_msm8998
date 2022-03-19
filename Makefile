@@ -639,25 +639,15 @@ ARCH_AFLAGS :=
 ARCH_CFLAGS :=
 include arch/$(SRCARCH)/Makefile
 
-ifeq ($(cc-name),clang)
-KBUILD_CFLAGS	+= -O3
-KBUILD_CFLAGS	+= $(call cc-option, -mllvm -polly) \
-		   $(call cc-option, -mllvm -polly-run-dce) \
-		   $(call cc-option, -mllvm -polly-run-inliner) \
-		   $(call cc-option, -mllvm -polly-opt-fusion=max) \
-		   $(call cc-option, -mllvm -polly-ast-use-context) \
-		   $(call cc-option, -mllvm -polly-detect-keep-going) \
-		   $(call cc-option, -mllvm -polly-vectorizer=stripmine) \
-		   $(call cc-option, -mllvm -polly-invariant-load-hoisting)
-else
-KBUILD_CFLAGS	+= -O2
-endif
-
-ifeq ($(cc-name),gcc)
-KBUILD_CFLAGS	+= -mcpu=cortex-a73.cortex-a53
-endif
-ifeq ($(cc-name),clang)
-KBUILD_CFLAGS	+= -mcpu=cortex-a53
+ifdef CONFIG_LLVM_POLLY
+KBUILD_CFLAGS	+= -mllvm -polly \
+		   -mllvm -polly-run-dce \
+		   -mllvm -polly-run-inliner \
+		   -mllvm -polly-opt-fusion=max \
+		   -mllvm -polly-ast-use-context \
+		   -mllvm -polly-detect-keep-going \
+		   -mllvm -polly-vectorizer=stripmine \
+		   -mllvm -polly-invariant-load-hoisting
 endif
 
 KBUILD_CFLAGS	+= $(call cc-option,-fno-delete-null-pointer-checks,)
@@ -668,8 +658,14 @@ KBUILD_CFLAGS	+= $(call cc-disable-warning, int-in-bool-context)
 KBUILD_CFLAGS	+= $(call cc-disable-warning, address-of-packed-member)
 KBUILD_CFLAGS	+= $(call cc-disable-warning, attribute-alias)
 
-ifdef CONFIG_CC_WERROR
-KBUILD_CFLAGS	+= -Werror
+ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+KBUILD_CFLAGS	+= -Os
+else
+ifdef CONFIG_PROFILE_ALL_BRANCHES
+KBUILD_CFLAGS	+= -O2
+else
+KBUILD_CFLAGS   += -O2
+endif
 endif
 
 ifdef CONFIG_CC_WERROR
